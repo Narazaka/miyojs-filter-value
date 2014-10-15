@@ -7,8 +7,14 @@ if (typeof MiyoFilters === "undefined" || MiyoFilters === null) {
   MiyoFilters = {};
 }
 
-MiyoFilters.value = function(argument, request, id, stash) {
-  return this.call_entry(argument.value, request, id, stash);
+MiyoFilters.value = {
+  type: 'data-value',
+  filter: function(argument, request, id, stash) {
+    if ((argument != null ? argument.value : void 0) == null) {
+      throw 'argument.value undefined';
+    }
+    return this.call_entry(argument.value, request, id, stash);
+  }
 };
 
 if ((typeof module !== "undefined" && module !== null) && (module.exports != null)) {

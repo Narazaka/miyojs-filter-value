@@ -2,17 +2,35 @@ chai = require 'chai'
 chai.should()
 expect = chai.expect
 sinon = require 'sinon'
+Miyo = require 'miyojs'
 MiyoFilters = require '../value.js'
 
 describe 'value', ->
-	it 'should return value', ->
-		ms = sinon.stub()
-		ms.call_entry = sinon.stub()
-		ms.call_entry.returns 'val'
-		argument = value: 'dummy'
+	ms = null
+	request = null
+	id = null
+	stash = null
+	beforeEach ->
+		ms = new Miyo()
+		for name, filter of MiyoFilters
+			ms.filters[name] = filter
+		sinon.spy ms, 'call_entry'
 		request = ->
 		id = 'OnTest'
 		stash = null
-		return_argument = MiyoFilters.value.call ms, argument, request, id, stash
+	it 'should return value', ->
+		entry =
+			filters: ['value']
+			argument:
+				value: 'dummy'
+		return_argument = ms.call_filters entry, request, id, stash
 		ms.call_entry.calledWith('dummy').should.be.true
-		expect(return_argument).equals 'val'
+	it 'should throw with no value', ->
+		entry =
+			filters: ['value']
+		(-> ms.call_filters entry, request, id, stash).should.throw /argument\.value undefined/
+		entry =
+			filters: ['value']
+			argument:
+				other: 'a'
+		(-> ms.call_filters entry, request, id, stash).should.throw /argument\.value undefined/
